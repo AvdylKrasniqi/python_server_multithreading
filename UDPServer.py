@@ -28,6 +28,17 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
         else:
             return "Opsioni eshte i gabuar. Opsionet valide jane: cmtofeet, feettocm, kmtomiles, miletokm"
 
+    def help(self):
+        return "\nipaddress\nport\ncount teksti\nreverse teksti\npalindrome\nteksti\ntime\ngame\ngcf nr1 nr2\nconvert options nr\nmax nr1 nr2\nexit"
+        
+    def max(self, nr1, nr2):
+        if nr1 > nr2:
+            return str(nr1)
+        elif nr1 == nr2:
+            return "Baraz"
+        else:
+            return nr2
+
     def game(self):
         numrat = []
         while len(numrat) <= 5:
@@ -47,6 +58,10 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
         socket = self.request[1]
         current_thread = threading.current_thread()
         print("{}: client: {}, wrote: {}".format(current_thread.name, self.client_address, data))
+
+
+        if len(data) > 128:
+            socket.sendto(bytes("Gjatesia e mesazhit me e madhe se 128 nuk eshte e lejuar", 'UTF-8'), self.client_address)
 
         msg = data.decode("utf-8")
         if msg =='ipaddress':
@@ -104,13 +119,27 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
             except Exception as e:
                 print(e)
                 msg = "Argumentet mungojne."
+    
+        elif str(msg.split(' ', 2)[0]) =='max':
+            try:
+                nripare = int(msg.split(' ', 2)[1])
+                nridyte = int(msg.split(' ', 2)[2])
+                msg = self.max(nripare, nridyte)
+            except Exception as e:
+                print(e)
+                msg = "Argumenti 1 ose 2 mungon/Sigurohuni qe jeni duke shkruar numra"
+
+        elif msg == 'help':
+            msg = self.help()
+        else:
+            msg = "Nuk ekziston kjo komande. Shkruani help per te kerkuar ndihme"
         socket.sendto(bytes(msg, 'UTF-8'), self.client_address)
 
 class ThreadedUDPServer(socketserver.ThreadingMixIn, socketserver.UDPServer):
     pass
 
 if __name__ == "__main__":
-    HOST, PORT = "0.0.0.0", 8888
+    HOST, PORT = "127.0.0.1", 13000
 
     server = ThreadedUDPServer((HOST, PORT), ThreadedUDPRequestHandler)
 
@@ -119,7 +148,7 @@ if __name__ == "__main__":
 
     try:
         server_thread.start()
-        print("Server started at {} port {}".format(HOST, PORT))
+        print("Serveri startoi  {} : {}".format(HOST, PORT))
         while True: time.sleep(100)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()

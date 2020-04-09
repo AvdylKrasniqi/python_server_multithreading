@@ -5,7 +5,7 @@ class ClientThread(threading.Thread):
     def __init__(self,clientAddress,clientsocket):
         threading.Thread.__init__(self)
         self.csocket = clientsocket
-        print ("New connection added: ", clientAddress)
+        print ("Nje klient i ri u kyq: ", clientAddress)
 
     def countMessage(self, message):
         zanoret = {}
@@ -31,7 +31,18 @@ class ClientThread(threading.Thread):
         elif(method == "miletokm"):
             return str(1.60934*number)
         else:
-            return "Opsioni eshte i gabuar. Opsionet valide jane: cmtofeet, feettocm, kmtomiles, miletokm"
+            return "Opsioni eshte i gabuar. Opsionet valide jane: cmToFeet, feetToCm, kmToMiles, mileToKm"
+
+    def help(self):
+        return "\nipaddress\nport\ncount teksti\nreverse teksti\npalindrome\nteksti\ntime\ngame\ngcf nr1 nr2\nconvert options nr\nmax nr1 nr2\nexit"
+        
+    def max(self, nr1, nr2):
+        if nr1 > nr2:
+            return str(nr1)
+        elif nr1 == nr2:
+            return "Baraz"
+        else:
+            return str(nr2)
 
     def game(self):
         numrat = []
@@ -48,10 +59,12 @@ class ClientThread(threading.Thread):
         return message[::-1].strip()
 
     def run(self):
-        print ("Connection from : ", clientAddress)
+        print ("Konektimi nga: ", clientAddress)
         msg = ''
         while True:
             data = self.csocket.recv(1024)
+            if len(data) > 128:
+                self.csocket.send(bytes("Gjatesia e mesazhit me e madhe se 128 nuk eshte e lejuar",'UTF-8'))
             msg = data.decode()
             msg = msg.lower()
             print ("Nga klienti me IP ", clientAddress, " mesazhi: ", msg)
@@ -112,9 +125,24 @@ class ClientThread(threading.Thread):
                 except Exception as e:
                     print(e)
                     msg = "Argumentet mungojne."
+            elif msg == 'connectiontest':
+                msg = "Konektimi u be me sukses"
 
+            elif str(msg.split(' ', 2)[0]) =='max':
+                try:
+                    nripare = int(msg.split(' ', 2)[1])
+                    nridyte = int(msg.split(' ', 2)[2])
+                    msg = self.max(nripare, nridyte)
+                except Exception as e:
+                    print(e)
+                    msg = "Argumenti 1 ose 2 mungon/Sigurohuni qe jeni duke shkruar numra"
+
+            elif msg == 'help':
+                msg = self.help()
+            else:
+                msg = "Nuk ekziston kjo komande. Shkruani help per te kerkuar ndihme"
             self.csocket.send(bytes(msg,'UTF-8'))
-        print ("Client at ", clientAddress , " disconnected...")
+        print ("Klienti ", clientAddress , " eshte diskonektuar...")
 LOCALHOST = "127.0.0.1"
 PORT = 13000
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
