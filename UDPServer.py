@@ -5,6 +5,7 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
     def countMessage(self, message):
         zanoret = {}
         bashktingelloret = {}
+        
 
         for zanore in "aeiouy":
             count = message.count(zanore)
@@ -29,7 +30,7 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
             return "Opsioni eshte i gabuar. Opsionet valide jane: cmtofeet, feettocm, kmtomiles, miletokm"
 
     def help(self):
-        return "\nipaddress\nport\ncount teksti\nreverse teksti\npalindrome\nteksti\ntime\ngame\ngcf nr1 nr2\nconvert options nr\nmax nr1 nr2\nexit"
+        return "\nipaddress\nport\ncount teksti\nreverse teksti\npalindrome teksti\ntime\ngame\ngcf nr1 nr2\nconvert options nr\nmax nr1 nr2\nexit"
         
     def max(self, nr1, nr2):
         if nr1 > nr2:
