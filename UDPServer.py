@@ -38,7 +38,7 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
         elif nr1 == nr2:
             return "Baraz"
         else:
-            return nr2
+            return str(nr2)
 
     def game(self):
         numrat = []
@@ -58,13 +58,13 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
         data = self.request[0].strip()
         socket = self.request[1]
         current_thread = threading.current_thread()
-        print("{}: client: {}, wrote: {}".format(current_thread.name, self.client_address, data))
+        print("{}: Klienti: {}, Kerkesa: {}".format(current_thread.name, self.client_address, data))
 
 
         if len(data) > 128:
             socket.sendto(bytes("Gjatesia e mesazhit me e madhe se 128 nuk eshte e lejuar", 'UTF-8'), self.client_address)
 
-        msg = data.decode("utf-8")
+        msg = data.decode("utf-8").lower()
         if msg =='ipaddress':
             msg = self.client_address[0]
         elif msg =='port':
