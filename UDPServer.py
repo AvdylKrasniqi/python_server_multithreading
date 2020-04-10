@@ -88,7 +88,7 @@ class ThreadedUDPRequestHandler(socketserver.BaseRequestHandler):
 
         elif str(msg.split(' ', 1)[0]) =='palindrome':
             try:
-                if msg.split(' ', 1)[1] == self.reverseText(msg.split(' ', 1)[1]):
+                if self.reverseText(msg.split(' ', 1)[1]) == self.reverseText(self.reverseText(msg.split(' ', 1)[1])):
                     msg = "Teksti eshte palindrom"
                 else:
                     msg = "Teksti nuk eshte palindrom"
